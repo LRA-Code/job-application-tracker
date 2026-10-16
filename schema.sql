@@ -17,3 +17,11 @@ CREATE TABLE IF NOT EXISTS jobs (
  CONSTRAINT ck_salary_range CHECK (salary_min IS NULL OR salary_max IS NULL OR salary_max >= salary_min),
  INDEX idx_jobs_title (job_title)
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS applications (
+ application_id INT PRIMARY KEY AUTO_INCREMENT, job_id INT NOT NULL, application_date DATE NOT NULL,
+ status ENUM('Applied','Screening','Interview','Offer','Rejected','Withdrawn') NOT NULL DEFAULT 'Applied',
+ resume_version VARCHAR(50), cover_letter_sent BOOLEAN NOT NULL DEFAULT FALSE, interview_data JSON,
+ CONSTRAINT fk_applications_job FOREIGN KEY (job_id) REFERENCES jobs(job_id) ON DELETE RESTRICT,
+ CONSTRAINT ck_cover_letter CHECK (cover_letter_sent IN (0,1)),
+ INDEX idx_applications_status_date (status, application_date)
+) ENGINE=InnoDB;

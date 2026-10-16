@@ -21,3 +21,11 @@ TABLES['jobs'] = dict(singular='Job', pk='job_id', title='job_title', fields=[
     field('job_url', 'Job URL', 'url', maximum=300), field('date_posted', 'Date posted', 'date'),
     field('requirements', 'Required skills', 'skills', maximum=10000),
 ])
+STATUSES = ['Applied', 'Screening', 'Interview', 'Offer', 'Rejected', 'Withdrawn']
+TABLES['applications'] = dict(singular='Application', pk='application_id', title='application_date', fields=[
+    field('job_id', 'Job', 'foreign', True), field('application_date', 'Application date', 'date', True),
+    field('status', 'Status', 'select', True, choices=STATUSES),
+    field('resume_version', 'Resume version', maximum=50),
+    field('cover_letter_sent', 'Cover letter sent', 'checkbox'),
+    field('interview_data', 'Interview details (JSON)', 'json', maximum=10000),
+])
