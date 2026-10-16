@@ -34,6 +34,8 @@ understanding the generated code.
 - Guided me through local setup and helped when I encountered problems
   with terminal commands and configuration.
 - Explained how the files, functions, and database tables work together.
+- Provided guidance for recording the demonstration. I recorded the
+  submitted video myself without narration.
 
 ## What worked well
 
