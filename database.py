@@ -59,3 +59,23 @@ def save_record(table, values, record_id=None):
 def delete_record(table, record_id):
     pk = TABLES[table]['pk']
     query(f'DELETE FROM `{table}` WHERE `{pk}`=%s', (record_id,), True)
+
+def dashboard_data():
+    # A single connection keeps these reads in one consistent transaction.
+    with connection() as conn:
+        cur = conn.cursor(dictionary=True)
+        try:
+            counts = {}
+            for table in TABLES:
+                cur.execute(f'SELECT COUNT(*) AS n FROM `{table}`')
+                counts[table] = cur.fetchone()['n']
+            cur.execute('SELECT status, COUNT(*) AS n FROM applications GROUP BY status')
+            statuses = {r['status']: r['n'] for r in cur.fetchall()}
+            cur.execute('''SELECT a.application_id, a.application_date, a.status, j.job_title, c.company_name
+                           FROM applications a JOIN jobs j ON a.job_id=j.job_id
+                           JOIN companies c ON j.company_id=c.company_id
+                           ORDER BY a.application_date DESC, a.application_id DESC LIMIT 5''')
+            recent = cur.fetchall()
+            return dict(counts=counts, statuses=statuses, recent=recent)
+        finally:
+            cur.close()

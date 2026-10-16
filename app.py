@@ -3,12 +3,12 @@ import json
 import os
 import secrets
 import hmac
-from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, abort, flash, redirect, render_template, request, session, url_for
 from mysql.connector import Error, IntegrityError
 import database as db
-from models import TABLES
+from models import TABLES, STATUSES
+from matching import rank_jobs
 from validation import validate
 
 load_dotenv()
@@ -17,7 +17,7 @@ def create_app(test_config=None):
     app = Flask(__name__)
     app.config.update(SECRET_KEY=os.getenv('SECRET_KEY') or secrets.token_hex(32),
                       MAX_CONTENT_LENGTH=64 * 1024, SESSION_COOKIE_HTTPONLY=True,
-                      SESSION_COOKIE_SAMESITE='Lax')
+                      SESSION_COOKIE_SAMESITE='Lax', FEATURES=['job_match'])
     if test_config:
         app.config.update(test_config)
 
@@ -52,12 +52,25 @@ def create_app(test_config=None):
             if f['kind'] == 'foreign':
                 target = 'companies' if f['name'] == 'company_id' else 'jobs'
                 tm = TABLES[target]
-                options[f['name']] = [(str(r[tm['pk']]), r[tm['title']]) for r in db.list_records(target)]
+                options[f['name']] = [(str(r[tm['pk']]), r[tm['title']] + (' — ' + r['company_name'] if target == 'jobs' else '')) for r in db.list_records(target)]
         return options
 
     @app.route('/')
     def dashboard():
-        return redirect(url_for('records', table='companies'))
+        return render_template('dashboard.html', data=db.dashboard_data(), statuses=STATUSES)
+
+    @app.route('/job-match', methods=['GET', 'POST'])
+    def job_match():
+        skills = request.form.get('skills', '').strip() if request.method == 'POST' else ''
+        results, error = None, None
+        if request.method == 'POST':
+            if not skills or not any(s.strip() for s in skills.replace('\n', ',').split(',')):
+                error = 'Enter at least one skill.'
+            elif len(skills) > 10000:
+                error = 'Keep the skills list under 10,000 characters.'
+            else:
+                results = rank_jobs(db.list_records('jobs'), skills)
+        return render_template('job_match.html', skills=skills, results=results, error=error), (422 if error else 200)
 
     @app.route('/<table>')
     def records(table):
