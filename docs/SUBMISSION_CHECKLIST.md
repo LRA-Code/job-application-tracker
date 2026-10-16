@@ -13,6 +13,7 @@
 - [x] `AI_USAGE.md` — actual AI assistance and clearly marked student reflection.
 - [x] Incremental local Git commits with meaningful messages.
 - [x] Automated tests exercised against MySQL.
+- [x] `video/project_demo.mp4` — 3-minute 42-second captioned execution recording.
 
 ## Finish before submitting
 

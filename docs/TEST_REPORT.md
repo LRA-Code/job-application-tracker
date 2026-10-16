@@ -53,3 +53,9 @@ is used. Tests and the recording use fictional data. Your own MySQL installation
 credentials, GitHub upload, instructor access, and classroom submission still
 need to be verified. The GitHub Actions configuration is supplied but has not
 been run on GitHub by this agent.
+
+## Recording verification
+
+The MP4 was successfully encoded as H.264 and inspected. Its duration is 221.56
+seconds (3:42), inside the required 3–7 minute range. A sampled frame confirms
+readable application content and captions. The file is approximately 2.8 MiB.
