@@ -29,3 +29,10 @@ TABLES['applications'] = dict(singular='Application', pk='application_id', title
     field('cover_letter_sent', 'Cover letter sent', 'checkbox'),
     field('interview_data', 'Interview details (JSON)', 'json', maximum=10000),
 ])
+TABLES['contacts'] = dict(singular='Contact', pk='contact_id', title='contact_name', fields=[
+    field('company_id', 'Company', 'foreign', True),
+    field('contact_name', 'Contact name', required=True, maximum=100),
+    field('title', 'Title', maximum=100), field('email', 'Email', 'email', maximum=100),
+    field('phone', 'Phone', maximum=20), field('linkedin_url', 'LinkedIn URL', 'url', maximum=200),
+    field('notes', 'Notes', 'textarea', maximum=10000),
+])

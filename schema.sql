@@ -25,3 +25,9 @@ CREATE TABLE IF NOT EXISTS applications (
  CONSTRAINT ck_cover_letter CHECK (cover_letter_sent IN (0,1)),
  INDEX idx_applications_status_date (status, application_date)
 ) ENGINE=InnoDB;
+CREATE TABLE IF NOT EXISTS contacts (
+ contact_id INT PRIMARY KEY AUTO_INCREMENT, company_id INT NOT NULL,
+ contact_name VARCHAR(100) NOT NULL, title VARCHAR(100), email VARCHAR(100), phone VARCHAR(20),
+ linkedin_url VARCHAR(200), notes TEXT,
+ CONSTRAINT fk_contacts_company FOREIGN KEY (company_id) REFERENCES companies(company_id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
