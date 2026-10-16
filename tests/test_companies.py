@@ -27,6 +27,7 @@ def test_csrf_and_missing(client):
     assert client.post('/companies/new', data={'company_name': 'Unsafe'}).status_code == 400
     assert client.get('/companies/999999').status_code == 404
     assert client.get('/secrets').status_code == 404
+    assert client.post('/companies/new', data={'csrf_token': '☃'}).status_code == 400
 
 def test_sql_and_html_injection(client, post):
     name = "<script>alert('x')</script>'; DROP TABLE companies;--"

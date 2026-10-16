@@ -36,3 +36,31 @@ def test_transaction_rollback(client):
             cur.close()
             raise RuntimeError('Simulated interrupted transaction')
     assert not db.list_records('companies')
+
+def test_database_unavailable_page(client, monkeypatch):
+    from mysql.connector import OperationalError
+    def unavailable():
+        raise OperationalError('Simulated database outage')
+    monkeypatch.setattr(db, 'dashboard_data', unavailable)
+    response = client.get('/')
+    assert response.status_code == 503
+    assert b'Check your MySQL service' in response.data
+
+def test_database_constraints(client, post):
+    from mysql.connector import Error
+    post('/companies/new', {'company_name':'Constraint Co'})
+    cid = db.list_records('companies')[0]['company_id']
+    with pytest.raises(Error):
+        db.query('INSERT INTO jobs (company_id,job_title,salary_min) VALUES (%s,%s,%s)', (cid,'Invalid',-1), True)
+    with pytest.raises(Error):
+        db.query('INSERT INTO jobs (company_id,job_title) VALUES (%s,%s)', (999999,'Orphan'), True)
+    with pytest.raises(Error):
+        db.query('INSERT INTO jobs (company_id,job_title,requirements) VALUES (%s,%s,%s)', (cid,'Invalid JSON','not JSON'), True)
+    assert not db.list_records('jobs')
+
+def test_seed_refuses_existing_records(client, post):
+    from seed import seed
+    post('/companies/new', {'company_name':'Keep Me'})
+    with pytest.raises(RuntimeError, match='empty tables'):
+        seed()
+    assert [r['company_name'] for r in db.list_records('companies')] == ['Keep Me']

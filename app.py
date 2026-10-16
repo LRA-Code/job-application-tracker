@@ -31,7 +31,7 @@ def create_app(test_config=None):
     def check_csrf():
         if request.method == 'POST':
             expected, actual = session.get('csrf_token', ''), request.form.get('csrf_token', '')
-            if not expected or not hmac.compare_digest(expected, actual):
+            if not expected or not hmac.compare_digest(expected.encode(), actual.encode()):
                 abort(400, 'Form expired. Reload the page and try again.')
 
     def metadata(table):
