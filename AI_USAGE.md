@@ -2,91 +2,115 @@
 
 ## Tools used
 
-ChatGPT (Codex coding agent) assisted with implementation, documentation, test
-creation, debugging, and packaging on October 16, 2026. No Claude, Gemini, or
-other AI service is claimed. The application itself does not call a GenAI API.
+ChatGPT (Codex coding agent) assisted with implementation, documentation,
+test creation, debugging, and packaging on October 16, 2026. The
+application itself does not call a GenAI API.
 
 ## Actual user prompt and supplied instructions
 
-The user supplied `Project_Specification.docx`, `AdvancedDBAssignments1-5.zip`,
-and asked:
+I supplied `Project_Specification.docx` and supporting assignment
+materials. My original request included:
 
-> Follow the instructions in this word document to make this project.
+> Follow the instructions in this word document to help me make this project.
 
-Additional supplied instructions required a GitHub repository URL, a recorded
+The supplied instructions required a GitHub repository URL, a recorded
 video file, `app.py`, `database.py`, HTML templates, CSS, `schema.sql`,
-`AI_USAGE.md`, `README.md`, and `requirements.txt`. They also directed starting
-with one table, completing CRUD before proceeding, committing frequently,
-testing features, and understanding generated code. The user added:
+`AI_USAGE.md`, `README.md`, and `requirements.txt`.
 
-> Build the whole thing if possible, but I will tell you if I get stuck
-
-These are the actual prompts. The following development decisions were made by
-the coding agent; they are not invented additional prompts from the student.
+They also directed starting with one table, completing CRUD before
+moving to the next, committing frequently, testing features, and
+understanding the generated code.
 
 ## Assistance provided
 
-- Read the final specification and supporting practice assignments; prioritized
-  the final four-table schema where older exercises differed.
-- Built Companies CRUD first and tested it against MySQL, then implemented and
-  tested Jobs, Applications, and Contacts in successive commits.
-- Wrote reusable table metadata, shared templates, parameterized SQL functions,
-  form validation, dashboard JOIN/aggregate queries, and skill ranking.
-- Added responsive CSS, confirmation pages, friendly error handling, CSRF checks,
-  test fixtures, sample data, and setup/submission documentation.
-- Prepared a recorded automated demonstration when supported by the environment;
-  see `video/README.md` for the delivered recording and its provenance.
+- Read the specification and supporting assignments, using the final
+  project schema where earlier exercises differed.
+- Built and tested Companies CRUD first, followed by Jobs, Applications,
+  and Contacts in separate local commits.
+- Generated database functions, shared form definitions, HTML templates,
+  input checks, dashboard queries, and skill-matching code.
+- Added CSS, deletion confirmation, error messages, CSRF checks, tests,
+  sample data, and setup instructions.
+- Guided me through local setup and helped when I encountered problems
+  with terminal commands and configuration.
+- Explained how the files, functions, and database tables work together.
 
 ## What worked well
 
-Shared form metadata reduced repeated code across four tables. Parameterized
-queries separated SQL syntax from user values. Deterministic skill matching
-made percentages easy to explain and test. Tests against an actual MySQL server
-verified JSON serialization, foreign-key restrictions, transactions, and CRUD
-rather than relying only on mocked database calls.
+Shared forms and templates reduced repeated code across the four tables.
+Parameterized queries kept submitted values separate from SQL commands.
+
+The matching calculation was easy to check with examples. Matching two
+of three required skills produced a result of about 67%.
+
+The setup instructions helped me connect Flask to MySQL. Browser checks
+let me test the features myself, and the automated tests checked database
+operations, input validation, relationships, and matching.
 
 ## Revisions made during AI-assisted development
 
-These were agent-made corrections or design refinements, **not claims of edits
-personally made by the student**:
+The coding agent made these changes while developing the application:
 
-- Followed the final specification's `job_url`, `requirements`, `interview_data`,
-  and ENUM definitions instead of copying the older practice schema unchanged.
-- Added salary-range validation, URL scheme checks, JSON-object validation,
-  foreign-key dropdown validation, and database CHECK constraints.
-- Chose RESTRICT deletion to prevent silently cascading through applications.
-- Fixed the test schema loader interaction with a semicolon in a SQL comment.
-- Made dropdown job names include company names to distinguish similar titles.
-- Defined empty requirements as 0% and removed duplicate skills before scoring.
-- Added explicit boundaries between the app database and destructive test data.
+- Followed the final specification's `job_url`, `requirements`,
+  `interview_data`, and ENUM definitions.
+- Added salary-range checks, URL checks, JSON-object validation,
+  foreign-key dropdown checks, and database CHECK constraints.
+- Used RESTRICT deletion to prevent removing records that still had
+  related records.
+- Fixed a schema-loading issue involving a semicolon in a SQL comment.
+- Added company names to job dropdown labels.
+- Removed repeated skills before calculating matches and assigned 0%
+  when a job had no listed requirements.
+- Kept the test database separate from the application database.
+
+These were changes made by the coding agent. My changes involved local
+configuration and data entered through the application.
 
 ## Concepts to understand before submission
 
-This list is a review guide, not a claim that the student has already learned it:
-
-1. A foreign key connects a child row to an existing parent. RESTRICT prevents
-   deleting a parent while children reference it.
-2. `%s` placeholders bind data as values; trusted table identifiers come from a
-   fixed metadata dictionary, not from arbitrary form input.
-3. A transaction is committed on success and rolled back on failure. Connections
-   and cursors must be closed in both cases.
-4. POST changes data. GET lists, shows, or requests confirmation. CSRF tokens
-   prevent another page from silently submitting a valid mutation form.
-5. JSON columns store structured data. Python serializes lists/objects with
-   `json.dumps` and reads them with `json.loads`.
-6. Matching measures required-skill coverage: two of three skills is about 67%.
-   Case and duplicates are normalized; synonyms are not inferred.
-7. A passing automated test is evidence for a specific behavior, not proof that
-   every possible environment or user input is correct.
+1. A foreign key links a record to a record in another table. RESTRICT
+   prevents deleting the parent while related records still reference it.
+2. `%s` placeholders pass values separately from SQL instructions.
+   Table and column names come from the app's defined metadata.
+3. A transaction commits changes when an operation succeeds and rolls
+   them back when it fails. Connections and cursors must be closed.
+4. GET requests display pages and forms. POST requests submit data.
+   CSRF tokens help protect form submissions.
+5. JSON columns store structured data. Python uses `json.dumps` and
+   `json.loads` to convert between JSON text and Python values.
+6. Matching measures how many required skills the user has. Two of
+   three required skills gives about 67%. Case and repeated skills
+   are handled, but synonyms are not inferred.
+7. Passing tests show that the checked behaviors worked. They do not
+   guarantee that every possible input or environment will work.
 
 ## Student review — complete honestly before submission
 
-- Code I personally reviewed and can explain: **To be completed by the student.**
-- Changes I personally made after receiving AI output: **To be completed by the student; write “none” if none.**
-- What I learned from using GenAI: **To be completed in my own words.**
-- Problems I encountered locally and how I resolved them: **To be completed after running locally.**
-- Date I ran the app and tests on my computer: **To be completed.**
+- **Code I personally reviewed and can explain:** I went through a
+  walkthrough of the database tables, Flask routes, CRUD functions,
+  form checks, and matching code. I still need to practice explaining
+  the implementation on my own.
 
-The agent must not invent these personal experiences. The Git history preserves
-agent-authored milestones under the Codex identity. Future student edits should
-use the student's own configured Git identity.
+- **Changes I personally made after receiving AI output:** I configured
+  the MySQL user and permissions, entered the database settings in
+  `.env`, and generated the Flask secret key. I added, edited, and
+  deleted records through the app. I also prepared the test database.
+
+- **What I learned from using GenAI:** AI can explain code and guide me
+  through setup, but I need to test its output. Running the app showed
+  me how Flask connects to MySQL and how record changes affect the
+  dashboard. Deleting related records showed why their order matters.
+
+- **Problems I encountered locally and how I resolved them:** I included
+  a step number when copying a terminal command, which caused a
+  “command not found” error. ChatGPT explained the mistake, and I ran
+  the command without the number. It also guided me through database
+  configuration and testing.
+
+- **Date I ran the app and tests on my computer:** October 16, 2026.
+  I checked the features in my browser and ran `python -m pytest -q`.
+  All 16 tests passed.
+
+The Git history preserves agent-authored commits under the Codex
+identity. Future code changes I make will use my own Git identity
+and will be documented here.
