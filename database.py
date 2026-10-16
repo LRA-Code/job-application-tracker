@@ -31,6 +31,8 @@ def query(sql, params=(), write=False):
 
 def list_records(table):
     meta = TABLES[table]
+    if table == 'jobs':
+        return query('SELECT j.*, c.company_name FROM jobs j JOIN companies c ON j.company_id=c.company_id ORDER BY j.job_id DESC')
     return query(f'SELECT * FROM `{table}` ORDER BY `{meta["pk"]}` DESC')
 
 def get_record(table, record_id):
